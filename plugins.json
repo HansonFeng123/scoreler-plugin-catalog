@@ -85,53 +85,23 @@
       ]
     },
     {
-      "id": "periodic-table",
+      "id": "science-toolkit",
       "owner": "HansonFeng123",
-      "name": "Periodic table",
-      "description": "Search all 118 elements by name, symbol or atomic number and see IUPAC reference values offline.",
+      "name": "Science Toolkit",
+      "description": "One offline study toolkit with an interactive periodic table, 13 physics equation calculators and a unit converter.",
       "subjects": [
         "Chemistry",
-        "化学"
-      ],
-      "keywords": [
-        "periodic table",
-        "elements",
-        "atomic weight",
-        "元素周期表",
-        "原子量"
-      ],
-      "scoreler": {
-        "min": "1.3.1",
-        "max": "1.99.99"
-      },
-      "permissions": [],
-      "repository": "https://github.com/HansonFeng123/scoreler-plugin-catalog",
-      "releases": [
-        {
-          "version": "1.0.0",
-          "tag": "v1.0.0",
-          "release": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/tag/v1.0.0",
-          "download": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/download/v1.0.0/periodic-table-1.0.0.zip",
-          "sha256": "2bd035a972f4e0d4611172caebd1e7d034f4b90b5183c4921ece0d98ff044b0c"
-        }
-      ]
-    },
-    {
-      "id": "physics-equations",
-      "owner": "HansonFeng123",
-      "name": "Physics equations",
-      "description": "Offline reference and SI-unit calculator for 13 equations across mechanics, waves, electricity and thermal physics.",
-      "subjects": [
         "Physics",
+        "化学",
         "物理"
       ],
       "keywords": [
-        "equations",
-        "mechanics",
-        "waves",
-        "electricity",
+        "periodic table",
+        "physics equations",
+        "unit converter",
+        "元素周期表",
         "物理公式",
-        "力学"
+        "单位换算"
       ],
       "scoreler": {
         "min": "1.3.1",
@@ -141,11 +111,11 @@
       "repository": "https://github.com/HansonFeng123/scoreler-plugin-catalog",
       "releases": [
         {
-          "version": "1.0.0",
-          "tag": "v1.0.0",
-          "release": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/tag/v1.0.0",
-          "download": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/download/v1.0.0/physics-equations-1.0.0.zip",
-          "sha256": "9a8852d8c304095928340ad7814acebafc85c416da1d978c44f08de0a53da246"
+          "version": "1.1.0",
+          "tag": "v1.1.0",
+          "release": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/tag/v1.1.0",
+          "download": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/download/v1.1.0/science-toolkit-1.1.0.zip",
+          "sha256": "b3d1191c5e8e7250cf0376e4e72daee2eaba7b0b8b00184b5875fe8fe96199fb"
         }
       ]
     }
