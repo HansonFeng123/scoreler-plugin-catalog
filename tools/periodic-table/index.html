@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Periodic table</title>
+<style>
+:root{color-scheme:light dark;font:15px/1.5 system-ui,sans-serif;color:var(--scoreler-text,#263d31);background:var(--scoreler-bg,#f3f6f2)}
+*{box-sizing:border-box}body{margin:0;padding:clamp(12px,3vw,28px)}h1{margin:0 0 4px;font-size:clamp(21px,4vw,30px)}p{margin:6px 0}small,.muted{color:var(--scoreler-muted,#496354)}
+button,input,select{font:inherit;border:1px solid var(--scoreler-line,#b8c9be);border-radius:8px;padding:8px 10px}
+button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--scoreler-accent,#507c66);outline-offset:2px}
+button.primary{background:var(--scoreler-accent,#507c66);color:var(--scoreler-onAccent,#fff)}
+.panel{border:1px solid var(--scoreler-line,#b8c9be);background:var(--scoreler-surface,#fff);border-radius:12px;padding:14px;margin-block:14px}
+.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-block:16px}
+label{display:grid;gap:4px}input{min-width:0;width:100%}output{display:block;font-weight:650;margin-top:12px}
+
+.scroll{overflow:auto;padding:4px}
+.table{display:grid;grid-template-columns:repeat(18,minmax(40px,1fr));gap:4px;min-width:790px}
+.marker{text-align:center;align-self:center;font-size:11px}
+.element{display:grid;gap:0;min-height:50px;padding:3px;text-align:center;line-height:1.22}
+.element span{font-size:11px}.element strong{font-size:16px}.element.series{border-style:dashed}
+.element.selected{outline:2px solid var(--scoreler-accent,#507c66);outline-offset:-3px}
+.element.dim{opacity:.35}
+.info{display:flex;flex-wrap:wrap;align-items:center;gap:12px 25px}
+.info h2{font-size:18px;margin:0}.info div{display:grid}
+</style>
+</head>
+<body>
+<header><h1>Periodic table</h1></header><div class="toolbar"><label><span></span><input type="search" autocomplete="off"></label><output aria-live="polite"></output></div><section class="panel info" aria-live="polite"></section><div class="scroll"><div class="table"></div></div><p><small>IUPAC · 2022 reference data</small></p>
+<script>
+const elements = [["H","hydrogen","氢","1.0080"],
+  ["He","helium","氦","4.0026"],
+  ["Li","lithium","锂","6.94"],
+  ["Be","beryllium","铍","9.0122"],
+  ["B","boron","硼","10.81"],
+  ["C","carbon","碳","12.011"],
+  ["N","nitrogen","氮","14.007"],
+  ["O","oxygen","氧","15.999"],
+  ["F","fluorine","氟","18.998"],
+  ["Ne","neon","氖","20.180"],
+  ["Na","sodium","钠","22.990"],
+  ["Mg","magnesium","镁","24.305"],
+  ["Al","aluminium","铝","26.982"],
+  ["Si","silicon","硅","28.085"],
+  ["P","phosphorus","磷","30.974"],
+  ["S","sulfur","硫","32.06"],
+  ["Cl","chlorine","氯","35.45"],
+  ["Ar","argon","氩","39.95"],
+  ["K","potassium","钾","39.098"],
+  ["Ca","calcium","钙","40.078"],
+  ["Sc","scandium","钪","44.956"],
+  ["Ti","titanium","钛","47.867"],
+  ["V","vanadium","钒","50.942"],
+  ["Cr","chromium","铬","51.996"],
+  ["Mn","manganese","锰","54.938"],
+  ["Fe","iron","铁","55.845"],
+  ["Co","cobalt","钴","58.933"],
+  ["Ni","nickel","镍","58.693"],
+  ["Cu","copper","铜","63.546"],
+  ["Zn","zinc","锌","65.38"],
+  ["Ga","gallium","镓","69.723"],
+  ["Ge","germanium","锗","72.630"],
+  ["As","arsenic","砷","74.922"],
+  ["Se","selenium","硒","78.971"],
+  ["Br","bromine","溴","79.904"],
+  ["Kr","krypton","氪","83.798"],
+  ["Rb","rubidium","铷","85.468"],
+  ["Sr","strontium","锶","87.62"],
+  ["Y","yttrium","钇","88.906"],
+  ["Zr","zirconium","锆","91.224"],
+  ["Nb","niobium","铌","92.906"],
+  ["Mo","molybdenum","钼","95.95"],
+  ["Tc","technetium","锝","[97]"],
+  ["Ru","ruthenium","钌","101.07"],
+  ["Rh","rhodium","铑","102.91"],
+  ["Pd","palladium","钯","106.42"],
+  ["Ag","silver","银","107.87"],
+  ["Cd","cadmium","镉","112.41"],
+  ["In","indium","铟","114.82"],
+  ["Sn","tin","锡","118.71"],
+  ["Sb","antimony","锑","121.76"],
+  ["Te","tellurium","碲","127.60"],
+  ["I","iodine","碘","126.90"],
+  ["Xe","xenon","氙","131.29"],
+  ["Cs","caesium","铯","132.91"],
+  ["Ba","barium","钡","137.33"],
+  ["La","lanthanum","镧","138.91"],
+  ["Ce","cerium","铈","140.12"],
+  ["Pr","praseodymium","镨","140.91"],
+  ["Nd","neodymium","钕","144.24"],
+  ["Pm","promethium","钷","[145]"],
+  ["Sm","samarium","钐","150.36"],
+  ["Eu","europium","铕","151.96"],
+  ["Gd","gadolinium","钆","157.25"],
+  ["Tb","terbium","铽","158.93"],
+  ["Dy","dysprosium","镝","162.50"],
+  ["Ho","holmium","钬","164.93"],
+  ["Er","erbium","铒","167.26"],
+  ["Tm","thulium","铥","168.93"],
+  ["Yb","ytterbium","镱","173.05"],
+  ["Lu","lutetium","镥","174.97"],
+  ["Hf","hafnium","铪","178.49"],
+  ["Ta","tantalum","钽","180.95"],
+  ["W","tungsten","钨","183.84"],
+  ["Re","rhenium","铼","186.21"],
+  ["Os","osmium","锇","190.23"],
+  ["Ir","iridium","铱","192.22"],
+  ["Pt","platinum","铂","195.08"],
+  ["Au","gold","金","196.97"],
+  ["Hg","mercury","汞","200.59"],
+  ["Tl","thallium","铊","204.38"],
+  ["Pb","lead","铅","207.2"],
+  ["Bi","bismuth","铋","208.98"],
+  ["Po","polonium","钋","[209]"],
+  ["At","astatine","砹","[210]"],
+  ["Rn","radon","氡","[222]"],
+  ["Fr","francium","钫","[223]"],
+  ["Ra","radium","镭","[226]"],
+  ["Ac","actinium","锕","[227]"],
+  ["Th","thorium","钍","232.04"],
+  ["Pa","protactinium","镤","231.04"],
+  ["U","uranium","铀","238.03"],
+  ["Np","neptunium","镎","[237]"],
+  ["Pu","plutonium","钚","[244]"],
+  ["Am","americium","镅","[243]"],
+  ["Cm","curium","锔","[247]"],
+  ["Bk","berkelium","锫","[247]"],
+  ["Cf","californium","锎","[251]"],
+  ["Es","einsteinium","锿","[252]"],
+  ["Fm","fermium","镄","[257]"],
+  ["Md","mendelevium","钔","[258]"],
+  ["No","nobelium","锘","[259]"],
+  ["Lr","lawrencium","铹","[262]"],
+  ["Rf","rutherfordium","𬬻","[267]"],
+  ["Db","dubnium","𬭊","[268]"],
+  ["Sg","seaborgium","𬭳","[269]"],
+  ["Bh","bohrium","𬭛","[270]"],
+  ["Hs","hassium","𬭶","[269]"],
+  ["Mt","meitnerium","鿏","[277]"],
+  ["Ds","darmstadtium","𫟼","[281]"],
+  ["Rg","roentgenium","𬬭","[282]"],
+  ["Cn","copernicium","鿔","[285]"],
+  ["Nh","nihonium","鉨","[286]"],
+  ["Fl","flerovium","𫓧","[290]"],
+  ["Mc","moscovium","镆","[290]"],
+  ["Lv","livermorium","𫟷","[293]"],
+  ["Ts","tennessine","鿬","[294]"],
+  ["Og","oganesson","鿫","[294]"]];
+const en = window.ScorelerPlugin?.locale !== 'zh-CN';
+const labels = en ? {
+  title:'Periodic table', search:'Search by name, symbol or atomic number', number:'Atomic number',
+  weight:'Abridged standard atomic weight', isotope:'Isotope mass number', period:'Period', group:'Group',
+  series:['Lanthanoids','Actinoids'], none:'No matching elements', count:'matching elements'
+} : {
+  title:'元素周期表', search:'搜索名称、符号或原子序数', number:'原子序数',
+  weight:'简化标准原子量', isotope:'同位素质量数', period:'周期', group:'族',
+  series:['镧系','锕系'], none:'未找到匹配元素', count:'个匹配元素'
+};
+document.documentElement.lang = en ? 'en' : 'zh-CN';
+document.querySelector('h1').textContent = labels.title;
+document.querySelector('label span').textContent = labels.search;
+const table = document.querySelector('.table');
+const detail = document.querySelector('.info');
+const search = document.querySelector('input');
+const status = document.querySelector('output');
+const periods = [2,10,18,36,54,86,118];
+const buttons = [];
+let selected;
+function put(node,row,column) {
+  node.style.gridRow = row;
+  node.style.gridColumn = column;
+  table.append(node);
+}
+function marker(text,row,column) {
+  const node = document.createElement('span');
+  node.className = 'marker muted';
+  node.textContent = text;
+  put(node,row,column);
+}
+for (let group=1; group<=18; group++) marker(group,1,group);
+marker('57–71',7,3);
+marker('89–103',8,3);
+marker('57–71',10,'1 / 4');
+marker('89–103',11,'1 / 4');
+function select(item) {
+  selected?.classList.remove('selected');
+  selected?.setAttribute('aria-pressed','false');
+  selected = item.button;
+  selected.classList.add('selected');
+  selected.setAttribute('aria-pressed','true');
+  detail.replaceChildren();
+  const heading = document.createElement('h2');
+  heading.textContent = item.symbol + ' · ' + (en ? item.name : item.chinese + ' / ' + item.name);
+  detail.append(heading);
+  const weightLabel = item.weight.startsWith('[') ? labels.isotope : labels.weight;
+  const values = [[labels.number,item.number],[weightLabel,item.weight],[labels.period,item.period]];
+  values.push(item.series < 0 ? [labels.group,item.group] : [en ? 'Series' : '系列',labels.series[item.series]]);
+  for (const [label,value] of values) {
+    const cell = document.createElement('div');
+    const key = document.createElement('small');
+    key.textContent = label;
+    const text = document.createElement('strong');
+    text.textContent = value;
+    cell.append(key,text);
+    detail.append(cell);
+  }
+}
+elements.forEach(([symbol,name,chinese,weight],index) => {
+  const number = index+1;
+  const period = periods.findIndex(end => number<=end)+1;
+  const offset = number-(periods[period-2] ?? 0);
+  const series = number>=57&&number<=71 ? 0 : number>=89&&number<=103 ? 1 : -1;
+  const group = period===1 && offset===2 ? 18 :
+    period>=2 && period<=3 && offset>=3 ? offset+10 :
+    period>=6 && offset>=18 ? offset-14 : offset;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = series < 0 ? 'element' : 'element series';
+  button.setAttribute('aria-label',number+' '+symbol+' '+(en?name:chinese));
+  button.setAttribute('aria-pressed','false');
+  const indexLabel = document.createElement('span');
+  indexLabel.textContent = number;
+  const symbolLabel = document.createElement('strong');
+  symbolLabel.textContent = symbol;
+  button.append(indexLabel,symbolLabel);
+  put(button,series < 0 ? period+1 : 10+series,series < 0 ? group : offset+1);
+  const item = {button,symbol,name,chinese,weight,number,period,group,series};
+  buttons.push(item);
+  button.addEventListener('click',() => select(item));
+});
+function matches() {
+  const query = search.value.trim().toLowerCase();
+  const numeric = /^\d+$/.test(query);
+  const filtered = buttons.filter(item => {
+    const match = numeric ? item.number===Number(query) :
+      [item.symbol,item.name,item.chinese].some(value => value.toLowerCase().includes(query));
+    item.button.classList.toggle('dim',!match);
+    return match;
+  });
+  status.textContent = query ? filtered.length ? filtered.length+' '+labels.count : labels.none : '';
+  return filtered;
+}
+search.addEventListener('input',matches);
+search.addEventListener('keydown',event => {
+  if (event.key !== 'Enter') return;
+  const filtered = matches();
+  const query = search.value.trim().toLowerCase();
+  const exact = filtered.find(item => [item.symbol,item.name,item.chinese,String(item.number)].some(value => value.toLowerCase()===query));
+  const item = exact ?? filtered[0];
+  if (item) {
+    select(item);
+    item.button.focus();
+  }
+});
+select(buttons[0]);
+</script>
+</body>
+</html>

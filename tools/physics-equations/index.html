@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Physics equations</title>
+<style>
+:root{color-scheme:light dark;font:15px/1.5 system-ui,sans-serif;color:var(--scoreler-text,#263d31);background:var(--scoreler-bg,#f3f6f2)}
+*{box-sizing:border-box}body{margin:0;padding:clamp(12px,3vw,28px)}h1{margin:0 0 4px;font-size:clamp(21px,4vw,30px)}p{margin:6px 0}small,.muted{color:var(--scoreler-muted,#496354)}
+button,input,select{font:inherit;border:1px solid var(--scoreler-line,#b8c9be);border-radius:8px;padding:8px 10px}
+button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--scoreler-accent,#507c66);outline-offset:2px}
+button.primary{background:var(--scoreler-accent,#507c66);color:var(--scoreler-onAccent,#fff)}
+.panel{border:1px solid var(--scoreler-line,#b8c9be);background:var(--scoreler-surface,#fff);border-radius:12px;padding:14px;margin-block:14px}
+.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-block:16px}
+label{display:grid;gap:4px}input{min-width:0;width:100%}output{display:block;font-weight:650;margin-top:12px}
+
+.layout{display:grid;gap:14px;grid-template-columns:minmax(170px,1fr) minmax(0,2fr)}
+.menu{display:grid;gap:6px;align-content:start}.menu button{text-align:left}
+.menu button[aria-pressed=true]{outline:2px solid var(--scoreler-accent,#507c66);outline-offset:-3px;font-weight:650}
+.workspace{margin:0}.workspace h2{margin:0}.equation{font:600 24px/1.5 system-ui;overflow-wrap:anywhere}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px;margin-block:14px}
+@media(max-width:580px){.layout{grid-template-columns:1fr}.menu{grid-template-columns:repeat(auto-fit,minmax(135px,1fr))}}
+</style>
+</head>
+<body>
+<header><h1>Physics equations</h1><p></p></header><div class="layout"><nav class="menu" aria-label="Equations"></nav><section class="panel workspace"><h2></h2><p class="equation"></p><p class="conditions muted"></p><div class="fields"></div><button class="primary" type="button">Calculate</button><output aria-live="polite"></output></section></div><p><small>Reference · OpenStax College Physics 2e</small></p>
+<script>
+const en = window.ScorelerPlugin?.locale !== 'zh-CN';
+const t = (english,chinese) => en ? english : chinese;
+const f = (symbol,english,chinese,unit,domain) => ({symbol,name:t(english,chinese),unit,domain});
+const mass=f('m','Mass','质量','kg','positive');
+const time=f('t','Time','时间','s','positive');
+const speed=f('v','Speed','速率','m/s','nonnegative');
+const accel=f('a','Acceleration','加速度','m/s²');
+const energy=f('E','Energy','能量','J');
+const formulas = [
+  ['Final velocity','末速度','v = u + at','m/s','Constant acceleration in one dimension. Use signed velocities.','一维匀加速运动，速度带正负号。',[f('u','Initial velocity','初速度','m/s'),accel,time],(u,a,t)=>u+a*t],
+  ['Displacement','位移','s = ut + ½at²','m','Constant acceleration in one dimension.','适用于一维匀加速运动。',[f('u','Initial velocity','初速度','m/s'),accel,time],(u,a,t)=>u*t+a*t*t/2],
+  ['Newton’s second law','牛顿第二定律','F = ma','N','Net force along the direction of the signed acceleration.','合力方向与加速度方向一致。',[mass,accel],(m,a)=>m*a],
+  ['Kinetic energy','动能','Eₖ = ½mv²','J','Classical mechanics at speeds well below the speed of light.','适用于速率远小于光速的经典力学。',[mass,speed],(m,v)=>m*v*v/2],
+  ['Momentum','动量','p = mv','kg·m/s','One component of momentum. Velocity can be signed.','动量的一个分量，速度带正负号。',[mass,f('v','Velocity','速度','m/s')],(m,v)=>m*v],
+  ['Work','功','W = Fd cos θ','J','Constant force. Enter the angle between force and displacement in degrees.','恒力与位移的夹角用度数输入。',[f('F','Force','力','N','nonnegative'),f('d','Displacement magnitude','位移大小','m','nonnegative'),f('θ','Angle','夹角','°','angle')],(F,d,a)=>F*d*(a===90?0:Math.cos(a*Math.PI/180))],
+  ['Power','功率','P = E / t','W','Average power over a time interval.','一段时间内的平均功率。',[energy,time],(E,t)=>E/t],
+  ['Density','密度','ρ = m / V','kg/m³','Mass divided by volume.','质量除以体积。',[mass,f('V','Volume','体积','m³','positive')],(m,V)=>m/V],
+  ['Wave speed','波速','v = fλ','m/s','Enter frequency and wavelength in the same medium.','输入同一介质中的频率与波长。',[f('f','Frequency','频率','Hz','positive'),f('λ','Wavelength','波长','m','positive')],(f,l)=>f*l],
+  ['Ohm’s law','欧姆定律','V = IR','V','Use for an ohmic resistor. Current can be signed.','适用于欧姆电阻，电流带正负号。',[f('I','Current','电流','A'),f('R','Resistance','电阻','Ω','nonnegative')],(I,R)=>I*R],
+  ['Electrical power','电功率','P = VI','W','Use voltage across and current through the same component.','使用同一元件两端的电压与流经它的电流。',[f('V','Voltage','电压','V'),f('I','Current','电流','A')],(V,I)=>V*I],
+  ['Heating','热量','Q = mcΔT','J','Assumes constant specific heat and no phase change.','假设比热容恒定且没有相变。',[mass,f('c','Specific heat','比热容','J/(kg·K)','positive'),f('ΔT','Temperature change','温度变化','K')],(m,c,d)=>m*c*d],
+  ['Ideal gas pressure','理想气体压强','p = nRT / V','Pa','Use kelvin for absolute temperature. R = 8.314462618 J/(mol·K).','绝对温度用开尔文。R = 8.314462618 J/(mol·K)。',[f('n','Amount','物质的量','mol','positive'),f('T','Temperature','温度','K','positive'),f('V','Volume','体积','m³','positive')],(n,T,V)=>n*8.314462618*T/V],
+];
+document.documentElement.lang = en ? 'en' : 'zh-CN';
+const el = name => document.querySelector(name);
+el('h1').textContent=t('Physics equations','物理公式');
+el('header p').textContent=t('Choose an equation, then enter values in the units shown.','选择公式，然后按所示单位输入数值。');
+el('.primary').textContent=t('Calculate','计算');
+const menu=el('.menu'), fields=el('.fields'), output=el('output');
+let chosen=0;
+const buttons=formulas.map(([english,chinese],index)=>{
+  const button=document.createElement('button');
+  button.type='button';
+  button.textContent=t(english,chinese);
+  button.addEventListener('click',()=>show(index));
+  menu.append(button);
+  return button;
+});
+function show(index) {
+  chosen=index;
+  buttons.forEach((button,i)=>button.setAttribute('aria-pressed',String(i===index)));
+  const [english,chinese,equation,,note,zhNote,params]=formulas[index];
+  el('h2').textContent=t(english,chinese);
+  el('.equation').textContent=equation;
+  el('.conditions').textContent=t(note,zhNote);
+  output.textContent='';
+  fields.replaceChildren();
+  for (const {symbol,name,unit,domain} of params) {
+    const label=document.createElement('label');
+    const input=document.createElement('input');
+    input.type='number';
+    input.step='any';
+    input.required=true;
+    if (domain) input.min='0';
+    if (domain==='angle') input.max='180';
+    label.append(symbol+' · '+name+' ('+unit+')',input);
+    fields.append(label);
+  }
+}
+fields.addEventListener('input',()=>{output.textContent='';});
+function calculate() {
+  if (Array.from(fields.querySelectorAll('input')).some(input => !input.reportValidity())) return;
+  const [,,,unit,,,params,solve]=formulas[chosen];
+  const values=Array.from(fields.querySelectorAll('input'),input=>input.valueAsNumber);
+  if (values.some((value,index)=>!Number.isFinite(value) || (params[index].domain==='positive' && value<=0))) {
+    output.textContent=t('Enter valid values. Fields that require a positive quantity must be above zero.','请输入有效数值。要求为正数的量必须大于零。');
+    return;
+  }
+  const result=solve(...values);
+  output.textContent=Number.isFinite(result) ? Number(result.toPrecision(8))+' '+unit : t('Result is outside the calculator’s range.','结果超出计算器范围。');
+}
+el('.primary').addEventListener('click',calculate);
+fields.addEventListener('keydown',event=>{ if(event.key==='Enter') calculate(); });
+show(0);
+</script>
+</body>
+</html>
