@@ -14,6 +14,8 @@ Scoreler validates the entire list before replacing its cache. Invalid JSON, uns
 
 - [Graphing calculator](https://github.com/HansonFeng123/scoreler-graphing-calculator): based on Equation.io by Anthony Foster (MIT); see the plugin's full license and credits.
 - [Offline Chinese-English translator](https://github.com/HansonFeng123/scoreler-offline-translator): credits and licenses for OPUS-MT, Transformers.js and ONNX Runtime are provided by the plugin.
+- [Periodic table](tools/periodic-table): search all 118 elements and look up atomic weights from the IUPAC 2022 table.
+- [Physics equations](tools/physics-equations): calculate with 13 equations in SI units. References OpenStax College Physics 2e.
 
 ## 中文
 
