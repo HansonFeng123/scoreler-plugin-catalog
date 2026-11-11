@@ -1,0 +1,14 @@
+{
+  "id": "science-toolkit",
+  "owner": "HansonFeng123",
+  "name": "Science Toolkit",
+  "description": "One offline study toolkit with an interactive periodic table, 13 physics equation calculators and a unit converter.",
+  "version": "1.1.0",
+  "scoreler": {
+    "min": "1.3.1",
+    "max": "1.99.99"
+  },
+  "permissions": [],
+  "entry": "index.html",
+  "apiVersion": 1
+}
