@@ -21,8 +21,31 @@ label{display:grid;gap:4px}input{min-width:0;width:100%}output{display:block;fon
 .element span{font-size:11px}.element strong{font-size:16px}.element.series{border-style:dashed}
 .element.selected{outline:2px solid var(--scoreler-accent,#507c66);outline-offset:-3px}
 .element.dim{opacity:.35}
+.element .property-value{font-size:10px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.table[data-mode=property] .element{min-height:58px}
+.table[data-mode=property] .element.selected{outline-color:currentColor}
+.table .element:focus-visible{outline:2px solid var(--scoreler-accent,#507c66);outline-offset:2px;position:relative;z-index:1}
+.legend{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;margin-block:8px;font-size:12px}
+.legend-scale{display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.legend-swatches{display:flex;overflow:hidden;border-radius:4px;border:1px solid var(--scoreler-line,#b8c9be)}
+.legend-swatches span,.legend-missing span{display:inline-block;width:16px;height:12px}
+.legend-missing{display:inline-flex;align-items:center;gap:6px}
+[data-heat="0"]{--heat-fill:#e7f3ff;--heat-ink:#14283e}
+[data-heat="1"]{--heat-fill:#b8dbf9;--heat-ink:#14283e}
+[data-heat="2"]{--heat-fill:#78b7ec;--heat-ink:#14283e}
+[data-heat="3"]{--heat-fill:#2c6ba7;--heat-ink:#fff}
+[data-heat="4"]{--heat-fill:#173d6b;--heat-ink:#fff}
+.legend-swatches span{background:var(--heat-fill)}
+#elements .element[data-heat]:not([data-heat=missing]){
+  background:var(--heat-fill)!important;color:var(--heat-ink)!important
+}
+#elements [data-heat=missing]{
+  background:repeating-linear-gradient(135deg,transparent 0 4px,color-mix(in srgb,var(--scoreler-line,#b8c9be) 35%,transparent) 4px 6px),var(--scoreler-surface,#fff)!important
+}
 .info{display:flex;flex-wrap:wrap;align-items:center;gap:12px 25px}
 .info h2{font-size:18px;margin:0}.info div{display:grid}
+.info .properties{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(135px,100%),1fr));gap:10px 16px;flex-basis:100%;padding-top:10px;border-top:1px solid var(--scoreler-line,#b8c9be);margin:0}
+.properties dt{font-size:12px;color:var(--scoreler-muted,#496354)}.properties dd{font-weight:650;margin:0}
 
 .layout{display:grid;gap:14px;grid-template-columns:minmax(170px,1fr) minmax(0,2fr)}
 .menu{display:grid;gap:6px;align-content:start}.menu button{text-align:left}
@@ -56,10 +79,18 @@ body{max-width:1320px;margin:auto}
 <main>
   <section id="elements" class="tool" role="tabpanel" aria-labelledby="tab-elements" tabindex="0">
     <div class="tool-heading"><h2></h2></div>
-    <div class="toolbar"><label><span></span><input type="search" autocomplete="off"></label><output aria-live="polite"></output></div>
+    <div class="toolbar">
+      <label><span id="element-search-label"></span><input type="search" autocomplete="off"></label>
+      <label><span id="property-mode-label"></span><select id="property-mode"></select></label>
+      <output aria-live="polite"></output>
+    </div>
     <section class="panel info" aria-live="polite"></section>
+    <div class="legend" id="property-legend" aria-live="polite" hidden>
+      <div class="legend-scale"><span id="property-low"></span><span class="legend-swatches" aria-hidden="true"><span data-heat="0"></span><span data-heat="1"></span><span data-heat="2"></span><span data-heat="3"></span><span data-heat="4"></span></span><span id="property-high"></span></div>
+      <span class="legend-missing"><span data-heat="missing" aria-hidden="true"></span><span id="property-missing-label"></span></span>
+    </div>
     <div class="scroll" role="region" tabindex="0"><div class="table"></div></div>
-    <p><small>IUPAC · 2022</small></p>
+    <p><small id="element-sources"></small></p>
   </section>
   <section id="equations" class="tool" role="tabpanel" aria-labelledby="tab-equations" tabindex="0" hidden>
     <header class="tool-heading"><h2></h2><p class="muted"></p></header>
@@ -89,6 +120,127 @@ body{max-width:1320px;margin:auto}
     <p><small>NIST · SP 811</small></p>
   </section>
 </main>
+<!-- Numeric properties from NCBI PubChem's periodic-table CSV, in atomic-number order. -->
+<script type="application/json" id="element-properties">[
+  [13.81,20.28,13.598,2.2,120,0.754],
+  [0.95,4.22,24.587,null,140,null],
+  [453.65,1615,5.392,0.98,182,0.618],
+  [1560,2744,9.323,1.57,153,null],
+  [2348,4273,8.298,2.04,192,0.277],
+  [3823,4098,11.26,2.55,170,1.263],
+  [63.15,77.36,14.534,3.04,155,null],
+  [54.36,90.2,13.618,3.44,152,1.461],
+  [53.53,85.03,17.423,3.98,135,3.339],
+  [24.56,27.07,21.565,null,154,null],
+  [370.95,1156,5.139,0.93,227,0.548],
+  [923,1363,7.646,1.31,173,null],
+  [933.437,2792,5.986,1.61,184,0.441],
+  [1687,3538,8.152,1.9,210,1.385],
+  [317.3,553.65,10.487,2.19,180,0.746],
+  [388.36,717.75,10.36,2.58,180,2.077],
+  [171.65,239.11,12.968,3.16,175,3.617],
+  [83.8,87.3,15.76,null,188,null],
+  [336.53,1032,4.341,0.82,275,0.501],
+  [1115,1757,6.113,1,231,null],
+  [1814,3109,6.561,1.36,211,0.188],
+  [1941,3560,6.828,1.54,187,0.079],
+  [2183,3680,6.746,1.63,179,0.525],
+  [2180,2944,6.767,1.66,189,0.666],
+  [1519,2334,7.434,1.55,197,null],
+  [1811,3134,7.902,1.83,194,0.163],
+  [1768,3200,7.881,1.88,192,0.661],
+  [1728,3186,7.64,1.91,163,1.156],
+  [1357.77,2835,7.726,1.9,140,1.228],
+  [692.68,1180,9.394,1.65,139,null],
+  [302.91,2477,5.999,1.81,187,0.3],
+  [1211.4,3106,7.9,2.01,211,1.35],
+  [1090,887,9.815,2.18,185,0.81],
+  [493.65,958,9.752,2.55,190,2.021],
+  [265.95,331.95,11.814,2.96,183,3.365],
+  [115.79,119.93,14,3,202,null],
+  [312.46,961,4.177,0.82,303,0.468],
+  [1050,1655,5.695,0.95,249,null],
+  [1795,3618,6.217,1.22,219,0.307],
+  [2128,4682,6.634,1.33,186,0.426],
+  [2750,5017,6.759,1.6,207,0.893],
+  [2896,4912,7.092,2.16,209,0.746],
+  [2430,4538,7.28,1.9,209,0.55],
+  [2607,4423,7.361,2.2,207,1.05],
+  [2237,3968,7.459,2.28,195,1.137],
+  [1828.05,3236,8.337,2.2,202,0.557],
+  [1234.93,2435,7.576,1.93,172,1.302],
+  [594.22,1040,8.994,1.69,158,null],
+  [429.75,2345,5.786,1.78,193,0.3],
+  [505.08,2875,7.344,1.96,217,1.2],
+  [903.78,1860,8.64,2.05,206,1.07],
+  [722.66,1261,9.01,2.1,206,1.971],
+  [386.85,457.55,10.451,2.66,198,3.059],
+  [161.36,165.03,12.13,2.6,216,null],
+  [301.59,944,3.894,0.79,343,0.472],
+  [1000,2170,5.212,0.89,268,null],
+  [1191,3737,5.577,1.1,240,0.5],
+  [1071,3697,5.539,1.12,235,0.5],
+  [1204,3793,5.464,1.13,239,null],
+  [1294,3347,5.525,1.14,229,null],
+  [1315,3273,5.55,null,236,null],
+  [1347,2067,5.644,1.17,229,null],
+  [1095,1802,5.67,null,233,null],
+  [1586,3546,6.15,1.2,237,null],
+  [1629,3503,5.864,null,221,null],
+  [1685,2840,5.939,1.22,229,null],
+  [1747,2973,6.022,1.23,216,null],
+  [1802,3141,6.108,1.24,235,null],
+  [1818,2223,6.184,1.25,227,null],
+  [1092,1469,6.254,null,242,null],
+  [1936,3675,5.426,1.27,221,null],
+  [2506,4876,6.825,1.3,212,null],
+  [3290,5731,7.89,1.5,217,0.322],
+  [3695,5828,7.98,2.36,210,0.815],
+  [3459,5869,7.88,1.9,217,0.15],
+  [3306,5285,8.7,2.2,216,1.1],
+  [2719,4701,9.1,2.2,202,1.565],
+  [2041.55,4098,9,2.28,209,2.128],
+  [1337.33,3129,9.226,2.54,166,2.309],
+  [234.32,629.88,10.438,2,209,null],
+  [577,1746,6.108,1.62,196,0.2],
+  [600.61,2022,7.417,2.33,202,0.36],
+  [544.55,1837,7.289,2.02,207,0.946],
+  [527,1235,8.417,2,197,1.9],
+  [575,null,9.5,2.2,202,2.8],
+  [202,211.45,10.745,null,220,null],
+  [300,null,3.9,0.7,348,0.47],
+  [973,1413,5.279,0.9,283,null],
+  [1324,3471,5.17,1.1,260,null],
+  [2023,5061,6.08,1.3,237,null],
+  [1845,null,5.89,1.5,243,null],
+  [1408,4404,6.194,1.38,240,null],
+  [917,4175,6.266,1.36,221,null],
+  [913,3501,6.06,1.28,243,null],
+  [1449,2284,5.993,1.3,244,null],
+  [1618,3400,6.02,1.3,245,null],
+  [1323,null,6.23,1.3,244,null],
+  [1173,null,6.3,1.3,245,null],
+  [1133,null,6.42,1.3,245,null],
+  [1800,null,6.5,1.3,null,null],
+  [1100,null,6.58,1.3,null,null],
+  [1100,null,6.65,1.3,null,null],
+  [1900,null,null,1.3,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null],
+  [null,null,null,null,null,null]
+]</script>
 <script>
 const en = window.ScorelerPlugin?.locale !== 'zh-CN';
 const t = (english, chinese) => en ? english : chinese;
@@ -263,11 +415,35 @@ tabs.forEach((tab, index) => {
   const root = document.getElementById('elements');
   root.querySelector('.scroll').setAttribute('aria-label', labels.title);
   root.querySelector('h2').textContent = labels.title;
-  root.querySelector('label span').textContent = labels.search;
+  root.querySelector('#element-search-label').textContent = labels.search;
   const table = root.querySelector('.table');
   const detail = root.querySelector('.info');
   const search = root.querySelector('input');
   const status = root.querySelector('output');
+  const mode = root.querySelector('#property-mode');
+  const legend = root.querySelector('#property-legend');
+  const unavailable = t('No data', '暂无数据');
+  const properties = [
+    {id:'melting',name:t('Melting point','熔点'),unit:'K'},
+    {id:'boiling',name:t('Boiling point','沸点'),unit:'K'},
+    {id:'ionization',name:t('First ionization energy','第一电离能'),unit:'eV'},
+    {id:'electronegativity',name:t('Electronegativity (Pauling)','电负性（鲍林标度）'),unit:''},
+    {id:'radius',name:t('Atomic radius (van der Waals)','原子半径（范德华）'),unit:'pm'},
+    {id:'affinity',name:t('Electron affinity','电子亲和能'),unit:'eV'}
+  ];
+  const propertyRows = JSON.parse(document.getElementById('element-properties').textContent);
+  const numberFormat = new Intl.NumberFormat(document.documentElement.lang, {maximumFractionDigits:3,useGrouping:false});
+  const formatValue = (value, property) => value === null ? '—' :
+    numberFormat.format(value) + (property.unit ? ' ' + property.unit : '');
+  const modeLabel = property => property.name + (property.unit ? ' · ' + property.unit : '');
+  root.querySelector('#property-mode-label').textContent = t('Color by','着色方式');
+  mode.append(new Option(t('Element symbols','元素符号'), ''));
+  properties.forEach(property => mode.append(new Option(modeLabel(property), property.id)));
+  root.querySelector('#property-missing-label').textContent = unavailable;
+  root.querySelector('#element-sources').textContent = t(
+    'Atomic weights from IUPAC (2022). Other values from NCBI PubChem. Phase-change values can depend on pressure or allotrope.',
+    '标准原子量来源于 IUPAC（2022），其余数据来源于 NCBI PubChem。相变温度可能受压力或同素异形体影响。'
+  );
   const periods = [2,10,18,36,54,86,118];
   const buttons = [];
   let selected;
@@ -309,6 +485,18 @@ tabs.forEach((tab, index) => {
       cell.append(key,text);
       detail.append(cell);
     }
+    const list = document.createElement('dl');
+    list.className = 'properties';
+    properties.forEach((property, index) => {
+      const cell = document.createElement('div');
+      const key = document.createElement('dt');
+      const value = document.createElement('dd');
+      key.textContent = property.name;
+      value.textContent = item.properties[index] === null ? unavailable : formatValue(item.properties[index], property);
+      cell.append(key,value);
+      list.append(cell);
+    });
+    detail.append(list);
   }
   elements.forEach(([symbol,name,chinese,weight],index) => {
     const number = index+1;
@@ -321,18 +509,51 @@ tabs.forEach((tab, index) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = series < 0 ? 'element' : 'element series';
-    button.setAttribute('aria-label',number+' '+symbol+' '+(en?name:chinese));
     button.setAttribute('aria-pressed','false');
     const indexLabel = document.createElement('span');
     indexLabel.textContent = number;
     const symbolLabel = document.createElement('strong');
     symbolLabel.textContent = symbol;
-    button.append(indexLabel,symbolLabel);
+    const valueLabel = document.createElement('span');
+    valueLabel.className = 'property-value';
+    valueLabel.hidden = true;
+    button.append(indexLabel,symbolLabel,valueLabel);
     put(button,series < 0 ? period+1 : 10+series,series < 0 ? group : offset+1);
-    const item = {button,symbol,name,chinese,weight,number,period,group,series};
+    const item = {button,symbol,name,chinese,weight,number,period,group,series,valueLabel,properties:propertyRows[index]};
     buttons.push(item);
     button.addEventListener('click',() => select(item));
   });
+  function colorTable() {
+    const index = properties.findIndex(property => property.id === mode.value);
+    const property = properties[index];
+    const values = property ? propertyRows.map(row => row[index]).filter(Number.isFinite) : [];
+    const low = Math.min(...values), high = Math.max(...values);
+    table.dataset.mode = property ? 'property' : 'symbols';
+    legend.hidden = !property;
+    if (property) {
+      root.querySelector('#property-low').textContent = formatValue(low, property);
+      root.querySelector('#property-high').textContent = formatValue(high, property);
+    }
+    for (const item of buttons) {
+      const label = item.number + ' ' + item.symbol + ' ' + (en ? item.name : item.chinese);
+      item.valueLabel.hidden = !property;
+      if (!property) {
+        delete item.button.dataset.heat;
+        item.button.setAttribute('aria-label', label);
+        item.button.removeAttribute('title');
+        continue;
+      }
+      const value = item.properties[index];
+      const ratio = high === low ? 0 : (value - low) / (high - low);
+      item.button.dataset.heat = value === null ? 'missing' : String(Math.min(4, Math.floor(ratio * 5)));
+      item.valueLabel.textContent = value === null ? '—' : numberFormat.format(value);
+      const description = label + ' · ' + property.name + ' · ' + (value === null ? unavailable : formatValue(value, property));
+      item.button.setAttribute('aria-label', description);
+      item.button.title = description;
+    }
+  }
+  mode.addEventListener('change',colorTable);
+  colorTable();
   function matches() {
     const query = search.value.trim().toLowerCase();
     const numeric = /^\d+$/.test(query);

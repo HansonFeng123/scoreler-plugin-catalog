@@ -7,3 +7,9 @@ Install **Science Toolkit** from **Toolbox → Plugins → Refresh plugin list**
 - **Unit converter** — Convert length, area, volume, mass, time, speed, pressure, energy and absolute temperature. Reference: [NIST Guide to the SI, Appendix B](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors).
 
 The interface follows Scoreler’s language and theme. It replaces the separate Periodic table and Physics equations catalog entries. If you already installed those versions, uninstall them from your installed plugins list when you are ready to switch.
+
+## Periodic-table properties
+
+Choose **Color by / 着色方式** to compare melting point, boiling point, first ionization energy, Pauling electronegativity, van der Waals atomic radius or electron affinity. The legend shows the range and units for the selected property. Hatched tiles mark elements with unavailable values. Select an element to see all six properties, including in the plain symbol view.
+
+The numeric properties come from the [NCBI PubChem periodic-table CSV](https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/CSV), retrieved November 12, 2026. Temperatures are in kelvins (K), energies are in electronvolts (eV), and radii are in picometres (pm). Phase-change temperatures can depend on pressure or allotrope. See [PubChem’s element pages](https://pubchem.ncbi.nlm.nih.gov/docs/periodic-table-element-pages) for original sources and measurement details.
