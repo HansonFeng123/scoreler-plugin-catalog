@@ -88,7 +88,7 @@
       "id": "science-toolkit",
       "owner": "HansonFeng123",
       "name": "Science Toolkit",
-      "description": "One offline study toolkit with an interactive periodic table, 13 physics equation calculators and a unit converter.",
+      "description": "An offline periodic table with six property heatmaps, 13 physics equation calculators and a unit converter.",
       "subjects": [
         "Chemistry",
         "Physics",
@@ -97,9 +97,12 @@
       ],
       "keywords": [
         "periodic table",
+        "element properties",
+        "heatmaps",
         "physics equations",
         "unit converter",
         "元素周期表",
+        "元素性质",
         "物理公式",
         "单位换算"
       ],
@@ -116,6 +119,13 @@
           "release": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/tag/v1.1.0",
           "download": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/download/v1.1.0/science-toolkit-1.1.0.zip",
           "sha256": "b3d1191c5e8e7250cf0376e4e72daee2eaba7b0b8b00184b5875fe8fe96199fb"
+        },
+        {
+          "version": "1.2.0",
+          "tag": "v1.2.0",
+          "release": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/tag/v1.2.0",
+          "download": "https://github.com/HansonFeng123/scoreler-plugin-catalog/releases/download/v1.2.0/science-toolkit-1.2.0.zip",
+          "sha256": "7b6e1317a666bbcd46795af07e683bc64757e673f95835c8ccc6fdaefa8bca11"
         }
       ]
     }
